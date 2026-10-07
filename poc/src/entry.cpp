@@ -20,6 +20,12 @@ void Java_qwerty_asdfgh_zxcvbn_lkjhgf(JNIEnv *env, jclass _)
     assets::populate_hash_map(blobs_config);
 
     auto natives = natives::get_native_methods_to_register();
+    if (natives.empty())
+    {
+        log_E("No native methods resolved to register.");
+        return;
+    }
+
     auto natives_arr = natives::map_to_jni_arr(natives);
 
     auto clazz_name = natives.at(0).clazz; // all natives should be in the same class
