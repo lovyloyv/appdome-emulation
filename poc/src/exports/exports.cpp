@@ -101,8 +101,8 @@ void signal_handler(int signum, siginfo_t* info, void* context)
     }
 #elif defined(__arm__)
     uint8_t first_byte = fault_address >> 24; // 0x6e000000 -> 0x6e
-    uint8_t other_bytes = fault_address & 0xFFFFFF;
-    if (first_byte <= 0x00 && other_bytes != 0x000000)
+    uint32_t other_bytes = fault_address & 0xFFFFFF;
+    if (first_byte == 0x00 || other_bytes != 0x000000)
     {
         // log_D("unmarked exception, ignoring");
         return;
@@ -147,7 +147,7 @@ void signal_handler(int signum, siginfo_t* info, void* context)
     // x0 = x1
     // x1 = x2
     ucontext->uc_mcontext.regs[0] = ucontext->uc_mcontext.regs[1];
-    ucontext->uc_mcontext.regs[2] = ucontext->uc_mcontext.regs[1];
+    ucontext->uc_mcontext.regs[1] = ucontext->uc_mcontext.regs[2];
 #elif defined(__arm__)
     ucontext->uc_mcontext.arm_pc = rebased_onload;
 

@@ -1,4 +1,5 @@
 #include <appdome.hpp>
+#include <logcat.hpp>
 #include <crypt/aes_ctr.hpp>
 #include <replaceable/blobs_magic.h>
 #include "SHA256.h"
@@ -107,15 +108,15 @@ namespace
     {
         std::string identifier = name + BLOBS_MAGIC;
         std::string hash_key = sha256(identifier);
-        printf("sha256 for %s : %s", identifier.c_str(), hash_key.c_str());
+        log_D("sha256 for %s : %s", identifier.c_str(), hash_key.c_str());
 
         std::transform(hash_key.begin(), hash_key.end(), hash_key.begin(), ::toupper);
-        printf("upper: %s", hash_key.c_str());
+        log_D("upper: %s", hash_key.c_str());
 
         auto it = HASH_KEYS.find(hash_key);
         if (it == HASH_KEYS.end())
         {
-            printf("couldnt find an uuid for this blob: %s", name.c_str());
+            log_E("couldnt find an uuid for this blob: %s", name.c_str());
             return std::string();
         }
 
@@ -129,7 +130,7 @@ std::string assets::get_by_uuid(const std::string &uuid)
     std::string encrypted_blob_data = get_apk_asset(blob_path);
     if (encrypted_blob_data.empty())
     {
-        printf("Failed to load blob with UUID: %s", uuid.c_str());
+        log_E("Failed to load blob with UUID: %s", uuid.c_str());
         return std::string();
     }
 
@@ -157,9 +158,9 @@ void assets::populate_hash_map(const std::string &blobs_config)
     auto parsed_config = parse_hash_map( std::vector<std::uint8_t>(blobs_config.begin(), blobs_config.end()) );
     HASH_KEYS = std::move(parsed_config);
 
-    printf("parsed blobs config: %zu pairs", HASH_KEYS.size());
-    printf("hash keys in config:");
+    log_D("parsed blobs config: %zu pairs", HASH_KEYS.size());
+    log_D("hash keys in config:");
     for (const auto& pair : HASH_KEYS) {
-        printf("  %s -> %s", pair.first.c_str(), pair.second.c_str());
+        log_D("  %s -> %s", pair.first.c_str(), pair.second.c_str());
     }
 }

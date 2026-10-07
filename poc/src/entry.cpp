@@ -1,5 +1,6 @@
 #include <jni.h>
 #include <appdome.hpp>
+#include <logcat.hpp>
 
 /**
  * Entry point for appdome.
@@ -10,11 +11,11 @@ void Java_qwerty_asdfgh_zxcvbn_lkjhgf(JNIEnv *env, jclass _)
     std::string blobs_config = assets::get_by_uuid(BLOBS_CONFIG_NAME);
     if (blobs_config.empty())
     {
-        printf("Failed to load blobs config.");
+        log_E("Failed to load blobs config.");
         return;
     }
 
-    printf("got %zu bytes", blobs_config.size());
+    log_D("got %zu bytes", blobs_config.size());
 
     assets::populate_hash_map(blobs_config);
 
@@ -25,12 +26,12 @@ void Java_qwerty_asdfgh_zxcvbn_lkjhgf(JNIEnv *env, jclass _)
     jclass clazz = env->FindClass(clazz_name.c_str());
     if (clazz == nullptr)
     {
-        printf("Failed to find class for native methods: %s", clazz_name.c_str());
+        log_E("Failed to find class for native methods: %s", clazz_name.c_str());
         return;
     }
 
     env->RegisterNatives(clazz, natives_arr, natives.size());
-    printf("Registered %zu native methods for class: %s", natives.size(), clazz_name.c_str());
+    log_I("Registered %zu native methods for class: %s", natives.size(), clazz_name.c_str());
 }
 
 extern "C"

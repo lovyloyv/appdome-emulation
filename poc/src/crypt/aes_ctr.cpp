@@ -234,7 +234,18 @@ std::vector<std::uint8_t> crypt::decrypt_blob_data(
     const config &cfg,
     std::size_t max_len)
 {
+    // malformed or other-format blobs: fail with an empty payload like a missing asset
+    const std::size_t header_end = std::max({cfg.payload_offset_off + 4, cfg.counter_size_off + 4, cfg.counter_off + 16});
+    if (enc.size() < header_end)
+    {
+        return {};
+    }
+
     const std::uint32_t payload_off = read_u32_le(&enc[cfg.payload_offset_off]);
+    if (payload_off > enc.size())
+    {
+        return {};
+    }
     const std::uint32_t counter_size = read_u32_le(&enc[cfg.counter_size_off]);
 
     std::array<std::uint8_t, 16> counter{};
